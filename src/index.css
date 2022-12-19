@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply w-full h-full;
+    }
+}
+
+@layer components {
+    #root {
+        @apply h-screen;
+    }
+}
+
+@layer utilities {
+    .bi {
+        fill: theme("colors.neutral-400");
+    }
+}
