@@ -8,7 +8,6 @@ export const Button = (
         rounded : string,
         label : string,
         override? : string,
-        iconSrc? : string
     }
 
 ) => {
@@ -32,21 +31,10 @@ export const Button = (
         }
     }
 
-    const value : string = props.iconSrc === undefined? props.label : "";
-
-    const renderImg = () => {
-        if (props.iconSrc !== undefined) return (
-            <img src={props.iconSrc} alt={"alt text"}/>
-        );
-    }
-
     if (props.isSubmit) return (
-        <input name={props.label.toLowerCase()} type={"submit"} className={`${props.override !== undefined ? props.override : ""} ${props.rounded} ${types()}`} value={value}>
-            {renderImg()}
-        </input>
+        <input name={props.label.toLowerCase()} type={"submit"} className={`${props.override !== undefined ? props.override : ""} ${props.rounded} ${types()}`} value={props.label}/>
     ); else return (
-        <input name={props.label.toLowerCase()} type={"button"} onClick={props.onClick} className={`${props.override !== undefined ? props.override : ""} ${props.rounded} ${types()}`} value={value}>
-            {renderImg()}
-        </input>
+        <input name={props.label.toLowerCase()} type={"button"} onClick={props.onClick} className={`${props.override !== undefined ? props.override : ""} ${props.rounded} ${types()}`} value={props.label}/>
+
     );
 }

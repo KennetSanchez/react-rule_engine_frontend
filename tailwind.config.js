@@ -3,6 +3,9 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx,html}"],
   theme: {
     extend: {
+      boxShadow: {
+        'inner-16' : 'inset 0px 0px 16px 0px rgba(0,0,0,0.25)'
+      },
       /*Awfully useful animation timing functions*/
       transitionTimingFunction: {
         'sine': {
