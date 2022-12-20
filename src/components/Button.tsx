@@ -8,6 +8,7 @@ export const Button = (
         rounded : string,
         label : string,
         override? : string,
+        iconSrc? : string
     }
 
 ) => {
@@ -26,11 +27,26 @@ export const Button = (
                 return `${shadow} ${size} metallic-to-r text-white text-base ${transition} hover:bg-none hover:bg-zinc-300 hover:text-zinc-800 ${focus} focus:ring-stone-400 active:ring-stone-500`;
             case "danger":
                 return `${shadow} ${size} bg-red-600 text-red-200 text-base ${transition} hover:bg-red-200 hover:text-red-600 ${focus} focus:ring-red-200`;
+            case "round-primary":
+                return `${shadow} h-10 w-10 bg-gradient-to-r from-red-600 to-red-900 text-white text-base ${transition} hover:bg-none hover:bg-red-300 hover:text-red-900 ${focus} focus:ring-red-400 active:bg-red-300 active:ring-red-500`;
         }
     }
+
+    const value : string = props.iconSrc === undefined? props.label : "";
+
+    const renderImg = () => {
+        if (props.iconSrc !== undefined) return (
+            <img src={props.iconSrc} alt={"alt text"}/>
+        );
+    }
+
     if (props.isSubmit) return (
-        <input name={props.label.toLowerCase()} type={"submit"} className={`${props.override !== undefined ? props.override : ""} ${props.rounded} ${types()}`} value={props.label}/>
+        <input name={props.label.toLowerCase()} type={"submit"} className={`${props.override !== undefined ? props.override : ""} ${props.rounded} ${types()}`} value={value}>
+            {renderImg()}
+        </input>
     ); else return (
-        <input name={props.label.toLowerCase()} type={"button"} onClick={props.onClick} className={`${props.override !== undefined ? props.override : ""} ${props.rounded} ${types()}`} value={props.label}/>
+        <input name={props.label.toLowerCase()} type={"button"} onClick={props.onClick} className={`${props.override !== undefined ? props.override : ""} ${props.rounded} ${types()}`} value={value}>
+            {renderImg()}
+        </input>
     );
 }
