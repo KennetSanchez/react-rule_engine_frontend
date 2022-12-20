@@ -6,11 +6,42 @@
     body {
         @apply w-full h-full;
     }
+
+    h1 {
+        @apply font-bold xl:text-4xl lg:text-3xl;
+    }
+
+    h4 {
+        @apply font-semibold xl:text-xl lg:text-base;
+    }
 }
 
 @layer components {
     #root {
         @apply h-screen;
+    }
+
+    /*bg-gradient-to-r from-zinc-700 via-zinc-400 via-zinc-300 via-zinc-700 via-zinc-800 via-neutral-700 to-zinc-700*/
+    .metallic-to-r {
+        background-image: linear-gradient(45deg,
+        theme("colors.zinc.600") 0%,
+        theme("colors.zinc.400") 16%,
+        theme("colors.zinc.300") 32%,
+        theme("colors.zinc.500") 48%,
+        theme("colors.zinc.700") 65%,
+        theme("colors.zinc.600") 82%,
+        theme("colors.zinc.700") 100%);
+    }
+
+    .metallic-to-l {
+        background-image: linear-gradient(to left,
+        theme("colors.zinc.600") 0%,
+        theme("colors.zinc.400") 16%,
+        theme("colors.zinc.300") 32%,
+        theme("colors.zinc.500") 48%,
+        theme("colors.zinc.700") 65%,
+        theme("colors.zinc.600") 82%,
+        theme("colors.zinc.700") 100%);
     }
 }
 

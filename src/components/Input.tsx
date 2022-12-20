@@ -9,8 +9,8 @@ export const Input = (
         width: string,
         globalOverride?: string,
         override?: string,
-        iconURIS?: { default: string, focus?: string, hover?: string, selected?: string, toggleFunction? : any},
-        secondaryIconURIS?: { default: string, focus?: string, hover?: string, selected?: string, toggleFunction? : any }
+        iconURIS?: { default: string, focus?: string, hover?: string, selected?: string, clickFunction?: any },
+        secondaryIconURIS?: { default: string, focus?: string, hover?: string, selected?: string, clickFunction?: any }
     }
 ) => {
 
@@ -28,6 +28,8 @@ export const Input = (
     const [currentIcon, setCurrentIcon] = useState(props.iconURIS?.default);
     const [borderStyle, setBorderStyle] = useState("bg-neutral-400");
     const [secondaryIcon, setSecondaryIcon] = useState(props.secondaryIconURIS?.default);
+    const [borderFocusedColorStart, setBorderFocusedColorStart] = useState("border-neutral-400");
+    const [borderFocusedColorEnd, setBorderFocusedColorEnd] = useState("border-neutral-400");
 
 
     const handleFocus = (e: React.ChangeEvent<HTMLTextAreaElement> | React.ChangeEvent<HTMLInputElement>) => {
@@ -48,11 +50,15 @@ export const Input = (
             setSecondaryIcon(props.secondaryIconURIS?.focus !== undefined ? props.secondaryIconURIS?.focus : props.secondaryIconURIS?.default);
             setTranslate(translateIn);
             setBorderStyle("bg-gradient-to-r from-red-800 to-red-600");
+            setBorderFocusedColorStart("border-red-800");
+            setBorderFocusedColorEnd("border-red-600");
         } else {
             setBorderStyle("bg-neutral-400");
             setCurrentIcon(props.iconURIS?.default);
             setSecondaryIcon(props.secondaryIconURIS?.default);
             setTranslate(translateOut);
+            setBorderFocusedColorStart("border-neutral-400");
+            setBorderFocusedColorEnd("border-neutral-400");
         }
     }
 
@@ -78,9 +84,11 @@ export const Input = (
     const renderSecondaryIcon = () => {
         if (props.secondaryIconURIS !== undefined)
             return (
-                <div className={`${secondaryIconSize} flex items-center justify-center`} onClick={props.secondaryIconURIS?.toggleFunction}>
+                <div
+                    className={`${secondaryIconSize} flex items-center justify-center border-l-2 border-solid ${borderFocusedColorEnd}`}>
                     <img src={`/svg/${secondaryIcon}`} alt={"Alt"}
-                         className={"w-full h-full"}/>
+                         className={"w-full h-full hover:cursor-pointer"}
+                         onClick={props.secondaryIconURIS?.clickFunction}/>
                 </div>);
     }
 
@@ -89,7 +97,9 @@ export const Input = (
             <div
                 className={`z-40 relative overflow-hidden ${props.width} ${props.type !== "textarea" ? "h-12" : "h-32"} rounded-lg ${props.globalOverride !== undefined ? props.globalOverride : ""}`}>
                 <div className={"z-30 absolute flex flex-row items-center flex-1 justify-around w-full h-full"}>
-                    <div className={`${iconSize} flex items-center justify-center`} onClick={props.iconURIS?.toggleFunction}>
+                    <div
+                        className={`${iconSize} flex items-center justify-center border-r-2 border-solid ${borderFocusedColorStart}`}
+                        onClick={props.iconURIS?.clickFunction}>
                         <img src={`/svg/${currentIcon}`} alt={"Mail thing"} className={"w-full h-full"}/>
                     </div>
                     {isArea()}
