@@ -31,9 +31,10 @@ export const Home = (
 
     const navigate = useNavigate();
     const [fetchedColumns, setFetchedColumns] = useState(dummyCols);
-    const [ruleRows, setRuleRows]: [{ right: ColumnType, left: ColumnType }[], any] = useState([{
+    const [ruleRows, setRuleRows]: [{ right: ColumnType, left: ColumnType, index : number }[], any] = useState([{
         right: {columnName: "", columnType: ""} as ColumnType,
         left: {columnName: "", columnType: ""} as ColumnType,
+        index: 0
     }]);
 
     const renderColumns = () => {
@@ -68,17 +69,41 @@ export const Home = (
     }
 
     const renderRuleRows = () => {
-        if (ruleRows.length === 0) return (
-            <RuleRow index={0}/>
-        );
+        if (ruleRows.length === 0) {
+            return (
+                <RuleRow handleRemove={(e) => removeRow(e, 0)}
+                         handleAdd={addRow} index={0}/>
+            );
+        }
         else return (
-            <div className={"my-8 flex w-4/5 h-full flex-col items-center space-y-4 overflow-y-auto scrollbar-hidden"}>
+            <div className={"mt-8 flex w-[90%] h-full flex-col items-center overflow-y-auto scrollbar-hidden"}>
                 {ruleRows.map((rule: any, index: number) => (
                     <RuleRow columnLeft={ruleRows[index].left} columnRight={ruleRows[index].right} key={index}
-                             index={index}/>
+                             index={index}
+                             handleRemove={(e) => removeRow(e, index)}
+                             handleAdd={addRow}/>
                 ))}
             </div>
         );
+    }
+
+    const removeRow = (e: React.MouseEvent, index : number) => {
+        e.preventDefault();
+        if (ruleRows.length > 1) {
+            setRuleRows(ruleRows.filter(row => row.index !== index));
+        }
+
+    }
+
+    const addRow = (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (ruleRows.length < 4) {
+            setRuleRows(ruleRows.concat({
+                right: {columnName: "", columnType: ""} as ColumnType,
+                left: {columnName: "", columnType: ""} as ColumnType,
+                index: ruleRows.length
+            }));
+        }
     }
 
     const exit = (e: React.MouseEvent) => {
@@ -97,7 +122,6 @@ export const Home = (
             return rule;
         });
         setRuleRows(newRuleRows);
-        console.log(ruleRows);
     }
 
     return (
@@ -109,7 +133,7 @@ export const Home = (
                     {renderColumns()}
                 </aside>
                 <section className={"flex flex-col justify-center items-center w-full"}>
-                    <Card isGlass={false} padding={"py-8"} size={"w-full h-96"} color={"bg-white"} spacing={""}
+                    <Card isGlass={false} padding={"py-4"} size={"w-full h-auto"} color={"bg-white"} spacing={""}
                           override={"rounded-b-3xl z-10"}>
                         <h1>Rule Creator</h1>
                         {renderRuleRows()}

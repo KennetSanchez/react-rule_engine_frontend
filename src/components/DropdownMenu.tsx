@@ -16,7 +16,7 @@ export const DropdownMenu = (
     }
 
     return (
-        <div className={`w-64 h-full py-5 flex items-center justify-between`} >
+        <div className={`w-64 h-10 flex items-center justify-between`} >
             <select defaultValue={options[0]} className={"appearance-none focus:outline-none w-full h-full border-solid rounded-md px-2 border-2 border-neutral-300 transition duration-300 quintic-in-out hover:border-neutral-400"} placeholder={options[0]} >
                 {renderOptions()}
             </select>
