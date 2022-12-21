@@ -3,7 +3,8 @@ import {Input} from "../components/Input";
 import {Button} from "../components/Button";
 import React, {FormEvent, useContext, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {UserToken} from "../security/UserToken";
+import {UserToken} from "../App";
+
 
 export const Login = (
     props: {}
@@ -47,7 +48,8 @@ export const Login = (
             .then(response => response.json())
             .then(response => {
                 if(response.token !== undefined){
-                    setToken(response.token);
+                    console.log(response.token);
+                    setToken(response.token)
                     navigate("/home");
                 }else{
                     alert("Error " + response.code + "\n" + response.message);

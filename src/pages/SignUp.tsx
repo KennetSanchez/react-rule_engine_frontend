@@ -3,7 +3,7 @@ import React, {FormEvent, useContext, useState} from "react";
 import {Card} from "../components/Card";
 import {Input} from "../components/Input";
 import {Button} from "../components/Button";
-import {UserToken} from "../security/UserToken";
+import {UserToken} from "../App";
 
 export const SignUp = (
     props: {}

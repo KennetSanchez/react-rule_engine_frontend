@@ -1,11 +1,13 @@
 import {Card} from "../components/Card";
 import {ColumnChip} from "../components/ColumnChip";
-import React, {useEffect, useState} from "react";
+import React, {SyntheticEvent, useContext, useEffect, useState} from "react";
 import {ColumnType} from "../model/ColumnType";
 import {ImageButton} from "../components/ImageButton";
 import {RuleRow} from "../components/RuleRow";
 import {useNavigate} from "react-router-dom";
 import {DragDropContext, Draggable, Droppable, DropResult} from "react-beautiful-dnd";
+import {Button} from "../components/Button";
+import {UserToken} from "../App";
 
 export const Home = (
     props: {}
@@ -13,29 +15,40 @@ export const Home = (
 
     const dummyCols: ColumnType[] = [
         {columnName: "Column A", columnType: "text", columnId: "col1"},
-        {columnName: "Column B", columnType: "numeric", columnId: "col2"},
-        {columnName: "Column C", columnType: "boolean", columnId: "col3"},
-        {columnName: "Column A", columnType: "text", columnId: "col4"},
+        {columnName: "Column B", columnType: "text", columnId: "col2"},
+        {columnName: "Column C", columnType: "text", columnId: "col3"},
+        {columnName: "Column A", columnType: "numeric", columnId: "col4"},
         {columnName: "Column B", columnType: "numeric", columnId: "col5"},
         {columnName: "Column C", columnType: "boolean", columnId: "col6"},
-        {columnName: "Column A", columnType: "text", columnId: "col7"},
-        {columnName: "Column B", columnType: "numeric", columnId: "col8"},
-        {columnName: "Column C", columnType: "boolean", columnId: "col9"},
-        {columnName: "Column A", columnType: "text", columnId: "col10"},
-        {columnName: "Column B", columnType: "numeric", columnId: "col11"},
-        {columnName: "Column C", columnType: "boolean", columnId: "col12"},
-        {columnName: "Column A", columnType: "text", columnId: "col13"},
-        {columnName: "Column B", columnType: "numeric", columnId: "col14"},
-        {columnName: "Column C", columnType: "boolean", columnId: "col15"},
+        {columnName: "Column A", columnType: "boolean", columnId: "col7"},
     ]
 
     const navigate = useNavigate();
-    const [fetchedColumns, setFetchedColumns] = useState(dummyCols);
-    const [ruleRows, setRuleRows]: [{ right: ColumnType, left: ColumnType, index : number }[], any] = useState([{
+    const [fetchedColumns, setFetchedColumns] : [ColumnType[], any] = useState(dummyCols);
+    const [ruleRows, setRuleRows]: [{ right: ColumnType, left: ColumnType, index: number, operation: string, concat: string }[], any] = useState([{
         right: {columnName: "", columnType: ""} as ColumnType,
         left: {columnName: "", columnType: ""} as ColumnType,
-        index: 0
+        index: 0,
+        operation: "",
+        concat: ""
     }]);
+    const operationParser: { [id: string]: string } = {
+        'Less than': '<',
+        'Greater than': '>',
+        'Less or equal to': '<=',
+        'Greater or equal to': '>=',
+        'Is True': '= TRUE',
+        'Is False': '= FALSE',
+        'Equal to': '=',
+        'Different from': '!='
+    }
+    const [query, setQuery] = useState("?queryString=");
+    const {token, setToken} = useContext(UserToken);
+
+    useEffect(() => {
+        fetchColumnNames();
+    }, []);
+
 
     const renderColumns = () => {
         if (fetchedColumns.length === 0) {
@@ -68,31 +81,55 @@ export const Home = (
         }
     }
 
+    const handleSelect = (e: SyntheticEvent<HTMLSelectElement, Event>) => {
+        const index: number = parseInt((e.target as HTMLSelectElement).id.replace("selectorS", ""))
+        const operation: string = (e.target as HTMLSelectElement).value;
+        const newRuleRows = ruleRows.map(rule => {
+            if (ruleRows.indexOf(rule) === index) {
+                return {...rule, operation: operation};
+            }
+            return rule;
+        });
+        setRuleRows(newRuleRows);
+    }
+
+    const handleConcat = (e: SyntheticEvent<HTMLSelectElement, Event>) => {
+        const index: number = parseInt((e.target as HTMLSelectElement).id.replace("selectorC", ""))
+        const concatVal: string = (e.target as HTMLSelectElement).value;
+        const newRuleRows = ruleRows.map(rule => {
+            if (ruleRows.indexOf(rule) === index) {
+                return {...rule, concat: concatVal};
+            }
+            return rule;
+        });
+        setRuleRows(newRuleRows);
+
+    }
+
+
     const renderRuleRows = () => {
         if (ruleRows.length === 0) {
             return (
                 <RuleRow handleRemove={(e) => removeRow(e, 0)}
-                         handleAdd={addRow} index={0}/>
+                         handleAdd={addRow} index={0} onSelect={handleSelect} onConcat={handleConcat}/>
             );
-        }
-        else return (
+        } else return (
             <div className={"mt-8 flex w-[90%] h-full flex-col items-center overflow-y-auto scrollbar-hidden"}>
                 {ruleRows.map((rule: any, index: number) => (
                     <RuleRow columnLeft={ruleRows[index].left} columnRight={ruleRows[index].right} key={index}
                              index={index}
                              handleRemove={(e) => removeRow(e, index)}
-                             handleAdd={addRow}/>
+                             handleAdd={addRow}
+                             onSelect={handleSelect}
+                             onConcat={handleConcat}/>
                 ))}
             </div>
         );
     }
 
-    const removeRow = (e: React.MouseEvent, index : number) => {
+    const removeRow = (e: React.MouseEvent, index: number) => {
         e.preventDefault();
-        if (ruleRows.length > 1) {
-            setRuleRows(ruleRows.filter(row => row.index !== index));
-        }
-
+        if (ruleRows.length > 1) setRuleRows(ruleRows.filter((row, i) => i !== index));
     }
 
     const addRow = (e: React.MouseEvent) => {
@@ -101,7 +138,9 @@ export const Home = (
             setRuleRows(ruleRows.concat({
                 right: {columnName: "", columnType: ""} as ColumnType,
                 left: {columnName: "", columnType: ""} as ColumnType,
-                index: ruleRows.length
+                index: ruleRows.length,
+                operation: "",
+                concat: ""
             }));
         }
     }
@@ -124,6 +163,41 @@ export const Home = (
         setRuleRows(newRuleRows);
     }
 
+    const processRule = (e: React.MouseEvent) => {
+        e.preventDefault();
+        const semanticRules: string[] = ruleRows.map(rule => {
+            const left: string = rule.left.columnName;
+            const operation: string = operationParser[rule.operation];
+            const right: string = operation.includes(" ") ? "" : ` ${rule.right.columnName}`;
+            const concat: string = rule.concat !== "" ? "" : ` ${rule.concat} `;
+            return `${left} ${operation}${right}${concat}`;
+        });
+        for (const rule in semanticRules) {
+            setQuery(`${query}${semanticRules[rule]}`)
+        }
+        console.log(query);
+    }
+
+    const fetchColumnNames = () => {
+        console.log(token);
+        fetch("http://localhost:8080/records/columns", {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(response => {
+                console.log(response);
+                const newColumnNames = fetchedColumns.map((col, i) => {
+                    return {...col, columnName: response[i]};
+                });
+                setFetchedColumns(newColumnNames);
+            })
+    }
+
     return (
         <DragDropContext onDragEnd={(result) => handleDragEnd(result)}>
             <div className={"flex w-full h-full selection:bg-red-200 bg-gradient-to-br from-neutral-400 to-white"}>
@@ -139,8 +213,10 @@ export const Home = (
                         {renderRuleRows()}
                     </Card>
                     <Card isGlass={false} padding={"mt-8 p-16"} size={"w-full h-full"} color={"bg-white"} spacing={""}
-                          override={"rounded-2xl z-0"}>
+                          override={"rounded-2xl z-0 relative"}>
                         In order to display the filtered columns, you need to filter them.
+                        <Button isSubmit={false} type={"primary"} rounded={"rounded-lg"} label={"Apply"}
+                                override={"absolute top-5 right-5"} onClick={processRule}/>
                     </Card>
                 </section>
                 <ImageButton position={"absolute bottom-5 right-5"} default={"/svg/box-arrow-left.svg"}
