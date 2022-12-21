@@ -1,14 +1,16 @@
 import {Card} from "../components/Card";
 import {Input} from "../components/Input";
 import {Button} from "../components/Button";
-import React, {FormEvent, useState} from "react";
+import React, {FormEvent, useContext, useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {UserToken} from "../security/UserToken";
 
 export const Login = (
     props: {}
 ) => {
 
     const navigate = useNavigate();
+    const {token, setToken} = useContext(UserToken);
     const [passShown, setPassShown] = useState("password");
     const [eyeIcons, setEyeIcons] = useState(["eye.svg", "eye-fill.svg"]);
 
@@ -28,7 +30,6 @@ export const Login = (
         e.preventDefault();
         const form = (e.target as HTMLFormElement);
         await signIn(form.email.value, form.password.value);
-        navigate("/home");
     }
 
     const signIn = async (email: string, password: string) => {
@@ -36,12 +37,27 @@ export const Login = (
             email: email,
             password: password
         }
-        console.log(payload);
+        await fetch("http://localhost:8080/login", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .then(response => {
+                if(response.token !== undefined){
+                    setToken(response.token);
+                    navigate("/home");
+                }else{
+                    alert("Error " + response.code + "\n" + response.message);
+                }
+            });
     }
 
     const handleSignUp = (e: React.MouseEvent<Element, MouseEvent>) => {
         e.preventDefault();
-        navigate("/users/create-user");
+        navigate("/register");
     }
 
     return (

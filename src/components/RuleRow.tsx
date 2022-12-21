@@ -6,7 +6,7 @@ export const RuleRow = (
     props: {
         columnLeft?: ColumnType,
         columnRight?: ColumnType,
-        index : number
+        index : number,
     }
 ) => {
 
@@ -20,9 +20,9 @@ export const RuleRow = (
 
     return (
         <div className={"flex flex-row justify-between items-center w-5/6 h-20 px-4"}>
-            <ColumnSlot name={"Column A"}/>
+            <ColumnSlot name={""} pos={"L"} index={props.index}/>
             <DropdownMenu options={operations()} index={props.index}/>
-            <ColumnSlot name={"Column B"}/>
+            <ColumnSlot name={""} pos={"R"} index={props.index}/>
         </div>
     );
 }

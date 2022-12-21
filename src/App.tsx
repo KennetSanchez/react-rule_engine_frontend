@@ -9,7 +9,7 @@ function App() {
     <div className="h-full overflow-x-hidden">
         <Routes>
             <Route path={"/login"} element={<Login/>}/>
-            <Route path={"/users/create-user"} element={<SignUp/>}/>
+            <Route path={"/register"} element={<SignUp/>}/>
             <Route path={"/home"} element={<Home/>}/>
             <Route path={"/"} element={<Navigate to={"/login"}/>} />
         </Routes>
