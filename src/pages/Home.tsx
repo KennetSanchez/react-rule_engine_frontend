@@ -1,6 +1,6 @@
 import {Card} from "../components/Card";
 import {ColumnChip} from "../components/ColumnChip";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {ColumnType} from "../model/ColumnType";
 import {ImageButton} from "../components/ImageButton";
 import {RuleRow} from "../components/RuleRow";
@@ -31,7 +31,10 @@ export const Home = (
 
     const navigate = useNavigate();
     const [fetchedColumns, setFetchedColumns] = useState(dummyCols);
-    const [ruleRows, setRuleRows] = useState([]);
+    const [ruleRows, setRuleRows]: [{ right: ColumnType, left: ColumnType }[], any] = useState([{
+        right: {columnName: "", columnType: ""} as ColumnType,
+        left: {columnName: "", columnType: ""} as ColumnType,
+    }]);
 
     const renderColumns = () => {
         if (fetchedColumns.length === 0) {
@@ -71,7 +74,8 @@ export const Home = (
         else return (
             <div className={"my-8 flex w-4/5 h-full flex-col items-center space-y-4 overflow-y-auto scrollbar-hidden"}>
                 {ruleRows.map((rule: any, index: number) => (
-                    <RuleRow key={index} index={index}/>
+                    <RuleRow columnLeft={ruleRows[index].left} columnRight={ruleRows[index].right} key={index}
+                             index={index}/>
                 ))}
             </div>
         );
@@ -83,7 +87,17 @@ export const Home = (
     }
 
     const handleDragEnd = (result: DropResult) => {
-        console.log(result.destination?.droppableId);
+        const split = result.destination?.droppableId.replace("columnSlot", "").split("");
+        const side = split![0] === "L" ? "left" : "right";
+        const index = parseInt(split![1]);
+        const newRuleRows = ruleRows.map(rule => {
+            if (ruleRows.indexOf(rule) === index) {
+                return {...rule, [side]: fetchedColumns[result.source.index]};
+            }
+            return rule;
+        });
+        setRuleRows(newRuleRows);
+        console.log(ruleRows);
     }
 
     return (

@@ -1,8 +1,9 @@
 import {useNavigate} from "react-router-dom";
-import React, {FormEvent, useState} from "react";
+import React, {FormEvent, useContext, useState} from "react";
 import {Card} from "../components/Card";
 import {Input} from "../components/Input";
 import {Button} from "../components/Button";
+import {UserToken} from "../security/UserToken";
 
 export const SignUp = (
     props: {}
@@ -10,6 +11,7 @@ export const SignUp = (
     const [passShown, setPassShown] = useState("password");
     const [eyeIcons, setEyeIcons] = useState(["eye.svg", "eye-fill.svg"]);
     const navigate = useNavigate();
+    const {token, setToken} = useContext(UserToken);
 
     const showPassword = (e: React.MouseEvent<HTMLImageElement>) => {
         if (passShown === "password") {
@@ -26,8 +28,7 @@ export const SignUp = (
     const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const form = (e.target as HTMLFormElement);
-        await signUp(form.suFirstName.value, form.suLastName.value, form.suEmail.value, form.suPassword.valu)
-        navigate("/login");
+        await signUp(form.suFirstName.value, form.suLastName.value, form.suEmail.value, form.suPassword.value)
     }
 
     const signUp = async (firstName: string, lastName: string, email: string, password: string) => {
@@ -37,7 +38,22 @@ export const SignUp = (
             email: email,
             password: password
         }
-        console.log(payload);
+        await fetch("http://localhost:8080/users/create-user", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .then(response => {
+                if(response.token !== undefined){
+                    setToken(response.token);
+                    navigate("/login");
+                }else{
+                    alert("Error " + response.code + "\n" + response.message);
+                }
+            });
     }
 
     const handleBack = (e: React.MouseEvent<Element, MouseEvent>) => {
