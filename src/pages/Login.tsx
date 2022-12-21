@@ -24,14 +24,24 @@ export const Login = (
         }
     }
 
-    const handleLogin = (e: FormEvent<HTMLFormElement>) => {
+    const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const form = (e.target as HTMLFormElement);
+        await signIn(form.email.value, form.password.value);
         navigate("/home");
+    }
+
+    const signIn = async (email: string, password: string) => {
+        const payload = {
+            email: email,
+            password: password
+        }
+        console.log(payload);
     }
 
     const handleSignUp = (e: React.MouseEvent<Element, MouseEvent>) => {
         e.preventDefault();
-        navigate("/signup");
+        navigate("/users/create-user");
     }
 
     return (
